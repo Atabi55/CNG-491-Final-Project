@@ -28,7 +28,7 @@ def detect_pose(frame):
     interpreter.invoke()
 
     # getting model output
-    keypoints = interpreter.get_tensor(output_details[0]['index'])[0][0]#(1, 1, 17, 3) to (17,3)
+    keypoints = interpreter.get_tensor(output_details[0]['index'])[0][0]#(1, 1, 17, 3) to (17,3) 3-> x,y ve güven değeri
 
     #one batch one pose [0][0]
 
@@ -56,7 +56,7 @@ while cap.isOpened():
 
     frame_height, frame_width, _ = frame.shape
     if left_confidence > 0.5:
-        cv2.circle(frame, (int(left_x * frame_width), int(left_y * frame_height)), 5, (0, 255, 0), -1)
+        cv2.circle(frame, (int(left_x * frame_width), int(left_y * frame_height)), 5, (0, 255, 0), -1)# left_y 0 ile 1 değerinde, pixel koordinatını öğrenmek için height/widht ile çarp
         cv2.putText(frame, f"Left Ankle: ({left_x:.2f}, {left_y:.2f})", 
                     (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
     if right_confidence > 0.5:
