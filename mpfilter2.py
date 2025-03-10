@@ -2,7 +2,6 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-# defining  pose model
 
 
 mp_pose = mp.solutions.pose
@@ -10,7 +9,7 @@ mp_pose = mp.solutions.pose
 AREA_WIDTH = 300
 AREA_HEIGHT = 200
 
-# open web cam
+#cam
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
