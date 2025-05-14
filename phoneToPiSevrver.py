@@ -1,6 +1,8 @@
 from flask import *
 import dataBase
 import subprocess
+from threading import Semaphore
+import socket
 
 
 def executeExercise(data):
@@ -16,6 +18,19 @@ def executeExercise(data):
 
 
 app = Flask(__name__)
+MAX_CONNECTIONS = 2  # Rig + phone
+connection_limiter = Semaphore(MAX_CONNECTIONS)
+
+@app.before_request
+def limit_connections():
+    if not connection_limiter.acquire(blocking=False):
+        client_ip = request.remote_addr
+        print(f"Rejected connection from {client_ip} (max connections reached)")
+        return jsonify({"error": "Robot busy"}), 429  # HTTP 429 = Too Many Requests
+
+@app.teardown_request
+def release_connection(exception=None):
+    connection_limiter.release()
 
 
 @app.route("/")
@@ -79,4 +94,5 @@ def exercise_instructions():
 
 dataBase.createExerciseTable("Exercises.db")
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")#ayrı ip nasıl yapılır bak, tek seferde kaç kişinin bağlancağını nasıl limitlerim bak
+    host_ip = socket.gethostbyname(socket.gethostname())
+    app.run(host=host_ip, port=5000, threaded=True)
