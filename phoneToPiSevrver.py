@@ -63,7 +63,7 @@ def get_stepping_exercises():
             'error': str(e)
         }), 404
 
-@app.route('/api/exercises/add-exercise', methods=['GET'])
+@app.route('/api/exercises/add-exercise', methods=['GET','POST'])
 def exercise_adding():
     if request.method == 'GET':
         if request.is_json:
@@ -90,7 +90,13 @@ def exercise_selection():
 
 @app.route("/exercise-instructions", methods=['GET'])
 def exercise_instructions():
-    return jsonify({'data': 'x.jpg'})#dinamik bir şekilde resim adını değiştirmemiz gerek.
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form
+    while(True):
+        if(data.get("exercise_status") == "complete"):
+            return redirect("/")
 
 dataBase.createExerciseTable("Exercises.db")
 if __name__ == "__main__":
