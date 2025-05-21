@@ -101,4 +101,4 @@ def exercise_instructions():
 dataBase.createExerciseTable("Exercises.db")
 if __name__ == "__main__":
     host_ip = socket.gethostbyname(socket.gethostname())
-    app.run(host=host_ip, port=5000, threaded=True)
+    app.run(host="0.0.0.0", port=5000, threaded=True)
