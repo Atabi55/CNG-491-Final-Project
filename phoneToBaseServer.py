@@ -11,7 +11,7 @@ app.secret_key = "123"
 @app.route("/index")
 def showHomePage():
     # response from the server
-    return "This is home page"
+    return jsonify({"message":"This is home page"})
 
 
 @app.route('/user/user-data', methods=['GET'])
@@ -40,7 +40,10 @@ def get_user_stats():
     dateUntil = data.get("dateUntil")
 
     # 1. Get exercises from DB
-    userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
+    if(dateFrom == None or dateUntil == None):
+        userdata = dataBase.getUserStats("Users.db", username)
+    else:
+        userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
     print(userdata, " ", username)
     return jsonify({"status": "success", "message": userdata})
 
@@ -77,7 +80,7 @@ def logout():
     global logVar
     session.pop("userName", None)
     logVar = 0
-    return redirect(url_for("index"))
+    return redirect(url_for("showHomePage"))
 
 
 @app.route("/register", methods=['GET', 'POST'])
