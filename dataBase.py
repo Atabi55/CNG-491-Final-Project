@@ -130,21 +130,21 @@ def validateUser(dbFileName, username, password):
 def updateUserWeight(dbFileName, username, weight):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
-    c.execute("UPDATE users SET weight = ? WHERE username = ?",(weight, username,))
+    c.execute("UPDATE user SET weight = ? WHERE username = ?",(weight, username,))
     conn.commit()
     conn.close()
 
 def updateUserHeight(dbFileName, username, height):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
-    c.execute("UPDATE users SET Height = ? WHERE username = ?",(height, username,))
+    c.execute("UPDATE user SET Height = ? WHERE username = ?",(height, username,))
     conn.commit()
     conn.close()
 
 def updateUserAge(dbFileName, username, age):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
-    c.execute("UPDATE users SET age = ? WHERE username = ?",(age, username,))
+    c.execute("UPDATE user SET age = ? WHERE username = ?",(age, username,))
     conn.commit()
     conn.close()
 def getExercisesByType(dbFileName, type):
