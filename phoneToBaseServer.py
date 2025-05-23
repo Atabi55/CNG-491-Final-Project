@@ -46,7 +46,26 @@ def get_user_stats():
         userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
     print(userdata, " ", username)
     return jsonify({"status": "success", "message": userdata})
+    
+@app.route('/user/edit-user', methods=['GET', 'POST'])
+def user_edit():
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form
 
+    attribute = data.get("userAttr")
+    newVal = data.get("attrVal")
+
+    if(attribute == "weight"):
+        dataBase.updateUserWeight("Users.db", username, newVal)
+    elif(attribute == "Height"):
+        dataBase.updateUserHeight("Users.db", username, newVal)
+    elif(attribute == "age"):
+        dataBase.updateUserAge("Users.db", username, newVal)
+    else:
+        return jsonify({"status": "failure"})
+    return redirect(url_for("get_user_data"))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
