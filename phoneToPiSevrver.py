@@ -82,7 +82,8 @@ def exercise_selection():
         data = request.get_json()
     else:
         data = request.form
-    selectedExercise = data.get("text")
+    selection = data.get("name")
+    selectedExercise = dataBase.getSpecificExerciseText("Exercises.db", selection)
     print(selectedExercise)
     executeExercise(selectedExercise)  # executing the exercise
     return redirect("/exercise-instructions")  # redirecting to the exercise page
