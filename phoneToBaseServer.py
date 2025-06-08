@@ -37,9 +37,9 @@ def get_user_stats():
     else:
         data = request.form
     if flask.request.method == 'POST':
-        sDate = data.get("statDate")
-        score = data.get("score")
-        values = [username, score, sDate]
+        sDate = data.get("statDate")# YYYY-mm-DD HH:MM:SS format e.g. 2025-05-04 13:25:31
+        score = data.get("score")# two decimal point float
+        values = [username, score, sDate]#username comes from the token
         dataBase.insertStats("Users.db", values)
     
     elif flask.request.method == 'GET':
