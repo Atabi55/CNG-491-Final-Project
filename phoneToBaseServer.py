@@ -29,23 +29,32 @@ def get_user_data():
         }), 500
 
 
+
 @app.route('/user/user-stats', methods=['GET', 'POST'])
 def get_user_stats():
     if request.is_json:
         data = request.get_json()
     else:
         data = request.form
+    if flask.request.method == 'POST':
+        sDate = data.get("statDate")
+        score = data.get("score")
+        values = [username, score, sDate]
+        dataBase.insertStats("Users.db", values)
+    
+    elif flask.request.method == 'GET':
 
-    dateFrom = data.get("dateFrom")
-    dateUntil = data.get("dateUntil")
+        dateFrom = data.get("dateFrom")
+        dateUntil = data.get("dateUntil")
 
-    # 1. Get exercises from DB
-    if(dateFrom == None or dateUntil == None):
-        userdata = dataBase.getUserStats("Users.db", username)
-    else:
-        userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
-    print(userdata, " ", username)
-    return jsonify({"status": "success", "message": userdata})
+        # 1. Get exercises from DB
+        if(dateFrom == None or dateUntil == None):
+            userdata = dataBase.getUserStats("Users.db", username)
+        else:
+            userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
+        print(userdata, " ", username)
+        return jsonify({"status": "success", "message": userdata})
+
     
 @app.route('/user/edit-user', methods=['GET', 'POST'])
 def user_edit():
