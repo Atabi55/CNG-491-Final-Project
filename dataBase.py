@@ -84,17 +84,21 @@ def insertUser(dbFileName, values):
 def insertExercise(dbFileName, values):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
-    c.execute("INSERT INTO EXERCISE VALUES(?,?,?)", values)
-    conn.commit()
-    conn.close()
+    try:
+        c.execute("INSERT INTO EXERCISE VALUES(?,?,?)", values)
+        conn.commit()
+    finally:    
+        conn.close()
 
 
 def insertStats(dbFileName, values):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
-    c.executemany("INSERT INTO STATS VALUES(?,?,?)", values)
-    conn.commit()
-    conn.close()
+    try:
+        c.execute("INSERT INTO STATS VALUES(?,?,?)", values)
+        conn.commit()
+    finally:
+        conn.close()
 
 
 # reading from database

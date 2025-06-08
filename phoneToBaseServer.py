@@ -36,13 +36,13 @@ def get_user_stats():
         data = request.get_json()
     else:
         data = request.form
-    if flask.request.method == 'POST':
+    if request.method == 'POST':
         sDate = data.get("statDate")# YYYY-mm-DD HH:MM:SS format e.g. 2025-05-04 13:25:31
         score = data.get("score")# two decimal point float
         values = [username, score, sDate]#username comes from the token
         dataBase.insertStats("Users.db", values)
-    
-    elif flask.request.method == 'GET':
+        return jsonify({"status": "success", "message": "stat score added successfully"})
+    elif request.method == 'GET':
 
         dateFrom = data.get("dateFrom")
         dateUntil = data.get("dateUntil")
