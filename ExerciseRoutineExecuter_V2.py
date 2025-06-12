@@ -46,7 +46,8 @@ def AI_foot_detection(verticalArray, horizontalArray):
     
     
     # Tespit alanı (görüntünün merkezinde küçük bir kutu)
-    boxSize = (int)(2800/verticalArray[0])
+    #boxSize = (int)(2800/verticalArray[0])
+    boxSize = 40
     box_width, box_height = boxSize, boxSize  # Daha küçük kutu
     center_x, center_y = width // 2, height // 2
     box_x1 = center_x - box_width // 2
@@ -106,7 +107,7 @@ def AI_foot_detection(verticalArray, horizontalArray):
                 moveIt = True
                 #iki adım arası not ediliyor
                 thisStep = time.time()
-                stepStat.append("%.2f"%(thisStep-pastStep))
+                stepStat.append((float)("%.2f"%(thisStep-pastStep)))
                 pastStep = thisStep         
                 #servo harekete geçiyor
                 set_angleVertical(tempY, verticalArray[stepCounter])
@@ -120,6 +121,7 @@ def AI_foot_detection(verticalArray, horizontalArray):
                     set_angleHorizontal(tempX, 50)
                     cap.release()
                     cv2.destroyAllWindows()
+                    stepStat[0] = stepStat[0] - 3
                     return ((end-start)-3)/len(verticalArray), stepStat
                 #Servo açısını göster
                 cv2.putText(frame, f"Servo: {current_angle}deg", (10, 30),
