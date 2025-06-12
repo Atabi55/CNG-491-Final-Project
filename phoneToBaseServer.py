@@ -11,7 +11,7 @@ app.secret_key = "123"
 @app.route("/index")
 def showHomePage():
     # response from the server
-    return "This is home page"
+    return jsonify({"message":"This is home page"})
 
 
 @app.route('/user/user-data', methods=['GET'])
@@ -29,21 +29,52 @@ def get_user_data():
         }), 500
 
 
+
 @app.route('/user/user-stats', methods=['GET', 'POST'])
 def get_user_stats():
     if request.is_json:
         data = request.get_json()
     else:
         data = request.form
+    if request.method == 'POST':
+        sDate = data.get("statDate")# YYYY-mm-DD HH:MM:SS format e.g. 2025-05-04 13:25:31
+        score = data.get("score")# two decimal point float
+        values = [username, score, sDate]#username comes from the token
+        dataBase.insertStats("Users.db", values)
+        return jsonify({"status": "success", "message": "stat score added successfully"})
+    elif request.method == 'GET':
 
-    dateFrom = data.get("dateFrom")
-    dateUntil = data.get("dateUntil")
+        dateFrom = data.get("dateFrom")
+        dateUntil = data.get("dateUntil")
 
-    # 1. Get exercises from DB
-    userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
-    print(userdata, " ", username)
-    return jsonify({"status": "success", "message": userdata})
+        # 1. Get exercises from DB
+        if(dateFrom == None or dateUntil == None):
+            userdata = dataBase.getUserStats("Users.db", username)
+        else:
+            userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
+        print(userdata, " ", username)
+        return jsonify({"status": "success", "message": userdata})
 
+    
+@app.route('/user/edit-user', methods=['GET', 'POST'])
+def user_edit():
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form
+
+    attribute = data.get("userAttr")
+    newVal = data.get("attrVal")
+
+    if(attribute == "weight"):
+        dataBase.updateUserWeight("Users.db", username, newVal)
+    elif(attribute == "Height"):
+        dataBase.updateUserHeight("Users.db", username, newVal)
+    elif(attribute == "age"):
+        dataBase.updateUserAge("Users.db", username, newVal)
+    else:
+        return jsonify({"status": "failure"})
+    return redirect(url_for("get_user_data"))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -77,7 +108,7 @@ def logout():
     global logVar
     session.pop("userName", None)
     logVar = 0
-    return redirect(url_for("index"))
+    return redirect(url_for("showHomePage"))
 
 
 @app.route("/register", methods=['GET', 'POST'])

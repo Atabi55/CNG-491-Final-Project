@@ -14,8 +14,9 @@ def executeExercise(data):
     result = subprocess.run(["python", script_name] + arguments, capture_output=True, text=True)
 
     print(result.stdout)
-    dataBase.insertStats("users.db", result.stdout)
-
+    msg = (result.stdout).split('\n')
+    #dataBase.insertStats("Users.db", result.stdout)
+    return msg[-2]#sending stat to phone which will redirect it to the base server
 
 app = Flask(__name__)
 MAX_CONNECTIONS = 2  # Rig + phone
@@ -39,7 +40,7 @@ def showHomePage():
     return "This is home page"
 
 
-@app.route('/api/exercises', methods=['POST'])
+@app.route('/api/exercises', methods=['POST','GET'])
 def get_stepping_exercises():
     try:
         if request.is_json:
@@ -82,12 +83,11 @@ def exercise_selection():
         data = request.get_json()
     else:
         data = request.form
-    selection = data.get("name")
-    selectedExercise = dataBase.getSpecificExerciseText("Exercises.db", selection)
+    selectedExercise = data.get("text")
     print(selectedExercise)
-    executeExercise(selectedExercise)  # executing the exercise
-    return redirect("/exercise-instructions")  # redirecting to the exercise page
-
+    msg = executeExercise(selectedExercise)  # executing the exercise
+    #return redirect("/exercise-instructions")  # redirecting to the exercise page
+    return jsonify({"stat":msg})
 
 @app.route("/exercise-instructions", methods=['GET'])
 def exercise_instructions():

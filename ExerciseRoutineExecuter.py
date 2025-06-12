@@ -5,22 +5,25 @@ from gpiozero import AngularServo
 from time import sleep
 import ast
 import sys
+import time
 # Initialize the servo on GPIO pin 14
 # min_pulse_width and max_pulse_width may need to be adjusted for your servo
 #14, 15
 
 
 # Function to set the servo angle
-def set_angleHorizontal(angle):
+def set_angleHorizontal(pastAngle, angle):
     servo1 = AngularServo(14, min_angle=0, max_angle=180, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000)
-    servo1.angle = angle
-    sleep(0.5)
+    for ang in range(pastAngle, angle, 5):
+        servo1.angle = ang
+        sleep(0.1)
     servo1.close()
                 
-def set_angleVertical(angle):
+def set_angleVertical(pastAngle, angle):
     servo2 = AngularServo(15, min_angle=0, max_angle=180, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000)
-    servo2.angle = angle
-    sleep(0.5)
+    for ang in range(pastAngle, angle, 5):
+        servo2.angle = ang
+        sleep(0.1)
     servo2.close()
 # defining  pose model
 
@@ -39,7 +42,9 @@ def AI_foot_detection(verticalArray, horizontalArray):
         exit()
 
     #starting mp model
-
+    tempX = horizontalArray[0]
+    tempY = verticalArray[0]
+    start = time.time()
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         while cap.isOpened():
             ret, frame = cap.read()
@@ -105,13 +110,16 @@ def AI_foot_detection(verticalArray, horizontalArray):
                     print("vert: ",verticalArray[stepCounter]," horz: ", horizontalArray[stepCounter])
                     ankleChecker = False
                     #calling servo functions
-                    set_angleVertical(verticalArray[stepCounter])
-                    set_angleHorizontal(horizontalArray[stepCounter])
+                    set_angleVertical(tempY, verticalArray[stepCounter])
+                    set_angleHorizontal(tempX, horizontalArray[stepCounter])
+                    tempY = verticalArray[stepCounter]
+                    tempX = horizontalArray[stepCounter]
                     stepCounter += 1
                     if(stepCounter == len(verticalArray)):
-                        print("sequence complete")
+                        end = time.time()
                         cap.release()
                         cv2.destroyAllWindows()
+                        return (end-start)/len(verticalArray)
                 
             # Draw detection area with a red frame
             cv2.rectangle(frame, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), (0, 0, 255), 2)
@@ -122,12 +130,12 @@ def AI_foot_detection(verticalArray, horizontalArray):
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-
-
+    
+    
     cap.release()
     cv2.destroyAllWindows()
-#vertArray = [37, 40, 43, 46, 49, 52, 51, 49, 48, 46, 45, 42, 49, 46, 43, 40, 46, 42, 48, 54, 60, 55, 51, 46, 42, 37, 40, 43, 46, 49, 52, 51, 49, 48, 46, 45, 42, 49, 46, 43, 40, 46, 42, 48, 54, 60]
-print("hello mars")
+    
+
 if len(sys.argv) < 2:
     print("Usage: python read_array.py <filename>")
     sys.exit(1)
@@ -141,4 +149,5 @@ with open(fileAddress, "r") as file:
 vertArray = ast.literal_eval(line1)
 horizArray = ast.literal_eval(line2)
 
-AI_foot_detection(vertArray, horizArray)
+msg = AI_foot_detection(vertArray, horizArray)
+print ("%.2f" % msg)
