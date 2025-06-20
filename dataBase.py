@@ -28,6 +28,7 @@ def createDataBase(dbFileName):  # db creation
             username TEXT NOT NULL,
             score Float NOT NULL,
             exerciseDate DATETIME NOT NULL,
+            exerciseName TEXT NOT NULL,
             FOREIGN KEY (userName) REFERENCES USER(userName),
             PRIMARY KEY (username, exerciseDate)
             )""")
@@ -84,21 +85,17 @@ def insertUser(dbFileName, values):
 def insertExercise(dbFileName, values):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
-    try:
-        c.execute("INSERT INTO EXERCISE VALUES(?,?,?)", values)
-        conn.commit()
-    finally:    
-        conn.close()
+    c.execute("INSERT INTO EXERCISE VALUES(?,?,?)", values)
+    conn.commit()
+    conn.close()
 
 
 def insertStats(dbFileName, values):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
-    try:
-        c.execute("INSERT INTO STATS VALUES(?,?,?)", values)
-        conn.commit()
-    finally:
-        conn.close()
+    c.executemany("INSERT INTO STATS VALUES(?,?,?)", values)
+    conn.commit()
+    conn.close()
 
 
 # reading from database
@@ -108,7 +105,7 @@ def readUser(dbFileName, username):
 
     c.execute("SELECT userName, fullName, email, gender, age, weight, height FROM USER WHERE userName = ?", (username,))
     row = c.fetchone()
-    conn.close()
+
     return row if row else None
 
 
@@ -123,7 +120,6 @@ def validateUser(dbFileName, username, password):
 
     c.execute("SELECT userName, password, salt FROM USER WHERE userName = ?", (username,))
     row = c.fetchone()
-    conn.close()
     pword = decrypt_data(row[1],seaSalt, row[2])
     if(pword == password):# username password match
         return True
@@ -131,26 +127,6 @@ def validateUser(dbFileName, username, password):
         return False
 
 
-def updateUserWeight(dbFileName, username, weight):
-    conn = sqlite3.connect(dbFileName)
-    c = conn.cursor()
-    c.execute("UPDATE user SET weight = ? WHERE username = ?",(weight, username,))
-    conn.commit()
-    conn.close()
-
-def updateUserHeight(dbFileName, username, height):
-    conn = sqlite3.connect(dbFileName)
-    c = conn.cursor()
-    c.execute("UPDATE user SET Height = ? WHERE username = ?",(height, username,))
-    conn.commit()
-    conn.close()
-
-def updateUserAge(dbFileName, username, age):
-    conn = sqlite3.connect(dbFileName)
-    c = conn.cursor()
-    c.execute("UPDATE user SET age = ? WHERE username = ?",(age, username,))
-    conn.commit()
-    conn.close()
 def getExercisesByType(dbFileName, type):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
@@ -160,7 +136,7 @@ def getExercisesByType(dbFileName, type):
     exercises = []
     for row in c.fetchall():
         exercises.append(row)
-    conn.close()
+
     return exercises
 
 
@@ -168,7 +144,7 @@ def getSpecificExerciseText(dbFileName, name):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
 
-    c.execute("SELECT text FROM EXERCISE WHERE name = ?", (name,))
+    c.execute("SELECT textName FROM EXERCISE WHERE name = ?", (name,))
 
     row = c.fetchone()
     conn.close()
@@ -242,3 +218,5 @@ def encrypt(plaintext: str, secret_key: str, salt: bytes = None) -> tuple[bytes,
     encrypted_data = cipher.encrypt(plaintext.encode())
 
     return encrypted_data, salt  # Return both for storage
+
+
