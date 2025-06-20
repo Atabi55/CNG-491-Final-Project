@@ -7,7 +7,7 @@ import socket
 
 def executeExercise(data):
     # Define the script and arguments
-    script_name = "ExerciseRoutineExecuter.py"
+    script_name = "ExerciseRoutineExecuter_V5.py"
     arguments = [data]  # Replace with correct data name
 
     # Run the script with arguments
@@ -16,7 +16,7 @@ def executeExercise(data):
     print(result.stdout)
     msg = (result.stdout).split('\n')
     #dataBase.insertStats("Users.db", result.stdout)
-    return msg[-2]#sending stat to phone which will redirect it to the base server
+    return msg[-2], msg[-3], msg[-4]#sending stat to phone which will redirect it to the base server
 
 app = Flask(__name__)
 MAX_CONNECTIONS = 2  # Rig + phone
@@ -51,13 +51,19 @@ def get_stepping_exercises():
         exercises = dataBase.getExercisesByType("Exercises.db", exerciseType)
 
         # 2. Return structured response
-        return jsonify({
+        response = jsonify({
             'success': True,
             'data': exercises,
             'message': f"Found {len(exercises)} {exerciseType} exercises"
         })
 
+        #print(response)
+        #print(response.data)
+        #print(response.get_json())
+        return response
+
     except Exception as e:
+        print(e)
         return jsonify({
             'success': False,
             'data': [],
@@ -77,17 +83,18 @@ def exercise_adding():
         dataBase.insertExercise("Exercises.db", [name, exerciseType, text])
         return jsonify({"status":"success","message": "exercise successfully added to the database"})
 
-@app.route("/exercise-selection", methods=['GET'])  # When an exercise is selected, this route will execute it.
+@app.route("/exercise-selection", methods=['GET','POST'])  # When an exercise is selected, this route will execute it.
 def exercise_selection():
     if request.is_json:
         data = request.get_json()
     else:
         data = request.form
-    selectedExercise = data.get("text")
+    selectedExerciseName = data.get("name")
+    selectedExercise = dataBase.getSpecificExerciseText("Exercises.db",selectedExerciseName)[0]
     print(selectedExercise)
-    msg = executeExercise(selectedExercise)  # executing the exercise
+    msg, tmpArr, dur = executeExercise(selectedExercise)  # executing the exercise
     #return redirect("/exercise-instructions")  # redirecting to the exercise page
-    return jsonify({"stat":msg})
+    return jsonify({"stat":msg, "interval": tmpArr, "duration": dur, "exercise": selectedExerciseName})
 
 @app.route("/exercise-instructions", methods=['GET'])
 def exercise_instructions():
@@ -102,4 +109,4 @@ def exercise_instructions():
 dataBase.createExerciseTable("Exercises.db")
 if __name__ == "__main__":
     host_ip = socket.gethostbyname(socket.gethostname())
-    app.run(host="0.0.0.0", port=5000, threaded=True)
+    app.run(host='192.168.137.110', port=5000, threaded=True)
