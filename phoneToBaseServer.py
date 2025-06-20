@@ -17,6 +17,7 @@ def showHomePage():
 @app.route('/user/user-data', methods=['GET'])
 def get_user_data():
     try:
+        print("Inside get_user_data")#debug
         userdata = dataBase.readUser("Users.db", username)
 
         return jsonify({"status": "success", 'data': userdata})
@@ -56,25 +57,24 @@ def get_user_stats():
         return jsonify({"status": "success", "message": userdata})
 
     
-@app.route('/user/edit-user', methods=['GET', 'POST'])
+@app.route('/user/edit-user', methods=['POST'])
 def user_edit():
     if request.is_json:
         data = request.get_json()
     else:
         data = request.form
 
-    attribute = data.get("userAttr")
-    newVal = data.get("attrVal")
+    print("Inside user_edit")#debug
+    # Expecting JSON: {"userName": ..., "weight": ..., "height": ..., "age": ...}
+    userName = data.get("userName")
+    weight = data.get("weight")
+    height = data.get("height")
+    age = data.get("age")
 
-    if(attribute == "weight"):
-        dataBase.updateUserWeight("Users.db", username, newVal)
-    elif(attribute == "Height"):
-        dataBase.updateUserHeight("Users.db", username, newVal)
-    elif(attribute == "age"):
-        dataBase.updateUserAge("Users.db", username, newVal)
-    else:
-        return jsonify({"status": "failure"})
-    return redirect(url_for("get_user_data"))
+    dataBase.updateUserWeight("Users.db", userName, weight)
+    dataBase.updateUserHeight("Users.db", userName, height)
+    dataBase.updateUserAge("Users.db", userName, age)
+    return jsonify({"status": "success"}), 200
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
