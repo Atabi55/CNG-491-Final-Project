@@ -40,7 +40,8 @@ def get_user_stats():
     if request.method == 'POST':
         sDate = data.get("statDate")# YYYY-mm-DD HH:MM:SS format e.g. 2025-05-04 13:25:31
         score = data.get("score")# two decimal point float
-        values = [username, score, sDate]#username comes from the token
+        eName = data.get("exercise")
+        values = [username, score, sDate, eName]#username comes from the token
         dataBase.insertStats("Users.db", values)
         return jsonify({"status": "success", "message": "stat score added successfully"})
     elif request.method == 'GET':
