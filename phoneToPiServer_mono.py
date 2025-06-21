@@ -106,6 +106,16 @@ def exercise_instructions():
         if(data.get("exercise_status") == "complete"):
             return redirect("/")
 
+
+@app.route("/user/exercise-names", methods=["GET"])
+def get_exercise_names():
+    try:
+        names = dataBase.getAllExerciseNames("Exercises.db")  # ✅ DOĞRU DB
+        return jsonify({"status": "success", "exercises": names})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 dataBase.createExerciseTable("Exercises.db")
 if __name__ == "__main__":
     host_ip = socket.gethostbyname(socket.gethostname())
