@@ -27,16 +27,22 @@ def AI_foot_detection(verticalArray, horizontalArray):
     stepStat = []
 
     model = YOLO("yolov8n.pt")
-
-    cap = cv2.VideoCapture(1)
+    camIn = 0
+    while True:
+        cap = cv2.VideoCapture(camIn)
+        if cap.isOpened():
+            break
+        else:
+            camIn += 1
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
     
     #position servo
-    tempX = horizontalArray[0]
-    tempY = verticalArray[0]
-    set_angleVertical(tempY, verticalArray[0])
-    set_angleHorizontal(tempX, horizontalArray[0])
+    tempX = 0
+    tempY = 0
+    #set_angleVertical(tempY, 5)
+    #set_angleHorizontal(tempX, 5)
+    
     
     #start= None
     start = time.time()
@@ -67,6 +73,10 @@ def AI_foot_detection(verticalArray, horizontalArray):
         return box_x1 <= foot_x <= box_x2 and box_y1 <= foot_y <= box_y2
 
     try:
+        tempX = horizontalArray[0]
+        tempY = verticalArray[0]
+        set_angleVertical(tempY, verticalArray[0])
+        set_angleHorizontal(tempX, horizontalArray[0])
         prev_frame_time = time.time()
         while True:
             ret, frame = cap.read()

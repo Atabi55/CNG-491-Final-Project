@@ -94,7 +94,7 @@ def exercise_selection():
     print(selectedExercise)
     msg, tmpArr, dur = executeExercise(selectedExercise)  # executing the exercise
     #return redirect("/exercise-instructions")  # redirecting to the exercise page
-    return jsonify({"stat":msg, "interval": tmpArr, "duration": dur, "exercise": selectedExerciseName})
+    return jsonify({"stat":msg, "interval": json.loads(tmpArr), "duration": dur, "exercise": selectedExerciseName})
 
 @app.route("/exercise-instructions", methods=['GET'])
 def exercise_instructions():
