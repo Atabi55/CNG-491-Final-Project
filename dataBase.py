@@ -95,7 +95,7 @@ def insertStats(dbFileName, values):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO STATS VALUES(?,?,?)", values)
+        c.execute("INSERT INTO STATS VALUES(?,?,?,?)", values)
         conn.commit()
     finally:
         conn.close()
