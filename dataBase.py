@@ -175,7 +175,7 @@ def getSpecificExerciseText(dbFileName, name):
 
     return row if row else None
 
-def getUserStats(dbFileName, username, dateUntil = datetime(2024,10,1).strftime('%Y-%m-%d %H:%M:%S'), dateFrom = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
+def getUserStats(dbFileName, username, exerciseName, dateUntil = datetime(2024,10,1).strftime('%Y-%m-%d %H:%M:%S'), dateFrom = datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
     conn = sqlite3.connect(dbFileName)
     c = conn.cursor()
 
@@ -186,19 +186,20 @@ def getUserStats(dbFileName, username, dateUntil = datetime(2024,10,1).strftime(
     dateUntil_dt = datetime.strptime(dateUntil, '%Y-%m-%d %H:%M:%S')
     dateUntilStr = dateUntil_dt.strftime('%Y-%m-%d %H:%M:%S')
 
-    c.execute(f"""
-           SELECT score, exerciseDate
-           FROM STATS 
-           WHERE userName = '{username}' 
-           AND exerciseDate BETWEEN '{dateFromStr}' AND '{dateUntilStr}'
-           ORDER BY exerciseDate DESC
-           """)
+    c.execute("""
+        SELECT score, exerciseDate, exerciseName
+        FROM STATS 
+        WHERE userName = ? 
+        AND exerciseName = ?
+        AND exerciseDate BETWEEN ? AND ?
+        ORDER BY exerciseDate DESC
+    """, (username, exerciseName, dateFromStr, dateUntilStr))
 
     rows = c.fetchall()
     conn.close()
-
-
     return rows if rows else []
+
+
 def decrypt_data(encrypted_data: bytes, secret_key: str, salt: bytes = None) -> str:
     if (salt == None):
         # Generate a random salt (16 bytes recommended for PBKDF2)
