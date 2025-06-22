@@ -126,12 +126,14 @@ def login():
             return jsonify({"status": "error", "message": "username and password don not match!"}), 400
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
+    print("Logging out")
     global logVar
     session.pop("userName", None)
     logVar = 0
-    return redirect(url_for("showHomePage"))
+    return "", 204  # No Content
+
 
 
 @app.route("/register", methods=['GET', 'POST'])
