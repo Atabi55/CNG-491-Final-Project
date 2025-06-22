@@ -44,7 +44,7 @@ def get_user_stats():
         values = [username, score, sDate, eName]#username comes from the token
         dataBase.insertStats("Users.db", values)
         return jsonify({"status": "success", "message": "stat score added successfully"})
-    elif request.method == 'GET':
+    elif request.method == 'GET':#dont use this method, use new route
 
         dateFrom = data.get("dateFrom")
         dateUntil = data.get("dateUntil")
@@ -56,6 +56,28 @@ def get_user_stats():
             userdata = dataBase.getUserStats("Users.db", username, dateUntil, dateFrom)
         print(userdata, " ", username)
         return jsonify({"status": "success", "message": userdata})
+
+
+@app.route('/user/fetch-stats', methods=['GET', 'POST'])#only use POST
+def fetch_user_stats():
+    if request.is_json:
+        data = request.get_json()
+    else:
+        data = request.form
+
+    dateFrom = data.get("dateFrom")
+    dateUntil = data.get("dateUntil")
+    exerciseName = data.get("exerciseName")#added this for stats page
+
+    # 1. Get exercises from DB
+    if(dateFrom == None or dateUntil == None):
+        userdata = dataBase.getUserStats("Users.db", username, exerciseName)
+    else:
+        userdata = dataBase.getUserStats("Users.db", username, exerciseName, dateUntil, dateFrom)
+    print(userdata, " ", username)
+    return jsonify({"status": "success", "message": userdata})
+
+
 
     
 @app.route('/user/edit-user', methods=['POST'])
