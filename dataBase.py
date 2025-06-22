@@ -245,12 +245,11 @@ def encrypt(plaintext: str, secret_key: str, salt: bytes = None) -> tuple[bytes,
     return encrypted_data, salt  # Return both for storage
 
 def getAllExerciseNames(db_name):
-    import sqlite3
     con = sqlite3.connect(db_name)
     cur = con.cursor()
 
     try:
-        cur.execute("SELECT DISTINCT exerciseName FROM STATS")
+        cur.execute("SELECT name FROM EXERCISE")
         rows = cur.fetchall()
         names = [row[0] for row in rows]
         return names
@@ -258,5 +257,4 @@ def getAllExerciseNames(db_name):
         print("Error in getAllExerciseNames:", e)
         return []
     finally:
-        con.close()  # 🔒 Bağlantıyı kapat
-
+        con.close() 
