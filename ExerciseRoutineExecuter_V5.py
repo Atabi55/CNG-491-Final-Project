@@ -12,14 +12,14 @@ def set_angleHorizontal(pastAngle, angle):
     servo1 = AngularServo(14, min_angle=0, max_angle=180, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000)
     for ang in range(pastAngle, angle, 5):
         servo1.angle = ang
-        sleep(0.05)
+        sleep(0.1)
     servo1.close()
 
 def set_angleVertical(pastAngle, angle):
     servo2 = AngularServo(15, min_angle=0, max_angle=180, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000)
     for ang in range(pastAngle, angle, 5):
         servo2.angle = ang
-        sleep(0.05)
+        sleep(0.1)
     servo2.close()
 
 def AI_foot_detection(verticalArray, horizontalArray):
@@ -54,14 +54,14 @@ def AI_foot_detection(verticalArray, horizontalArray):
     height, width = frame.shape[:2]
 
     center_x, center_y = width // 2, height // 2
-    boxSize = 60
+    boxSize = 65
     box_width, box_height = boxSize, boxSize
     current_angle = 50
 
     moveIt = True
     waiting = False
     cooldown_start_time = 0
-    cooldown = 0.1  #saniye
+    cooldown = 0.5  #saniye
     
     
 
@@ -87,8 +87,6 @@ def AI_foot_detection(verticalArray, horizontalArray):
             fps = 1 / (new_frame_time - prev_frame_time)
             prev_frame_time = new_frame_time
 
-            boxSize = int(2800 / verticalArray[0])
-            box_width, box_height = boxSize, boxSize
             roi_margin = box_width * 3
             roi_x1 = max(0, center_x - roi_margin // 2)
             roi_x2 = min(width, center_x + roi_margin // 2)
@@ -102,7 +100,7 @@ def AI_foot_detection(verticalArray, horizontalArray):
                     for box in boxes:
                         x1, y1, x2, y2 = map(int, box)
                         foot_x = (x1 + x2) // 2 + roi_x1
-                        foot_y = y2 - int((y2 - y1) * 0.2)
+                        foot_y = y2 - int((y2 - y1) * 0.2) #burası 0.2 idi
 
                         if is_foot_in_box(foot_x, foot_y):
                             moveIt = False
