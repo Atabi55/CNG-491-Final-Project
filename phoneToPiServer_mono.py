@@ -110,7 +110,7 @@ def exercise_instructions():
 @app.route("/user/exercise-names", methods=["GET"])
 def get_exercise_names():
     try:
-        names = dataBase.getAllExerciseNames("Exercises.db")  # ✅ DOĞRU DB
+        names = dataBase.getAllExerciseNames("Exercises.db") 
         return jsonify({"status": "success", "exercises": names})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
